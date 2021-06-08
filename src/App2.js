@@ -3,11 +3,10 @@ import 'bulma/css/bulma.min.css';
 const App = () => {
   const [state, setState] = useState({
     fishMass: 25000,
-    proposedDailyFeed: 1,
     feedingRatio: 2,
     feedProtein: 28,
     totalWaterVolume: 500,
-    estimatedFilterExchangeRate: 1,
+    estimatedFilterExchangeRate: 2,
     mediaSSA: 500,
     amountOfAirPerM3: 1550,
     protein: 16,
@@ -27,7 +26,21 @@ const App = () => {
     });
   };
 
-  // console.log(state);
+  const tan = () => {
+    return (
+      state.feedProtein *
+      ((state.fishMass * state.feedingRatio) / 100000000) *
+      state.nitrogen *
+      state.wasteNitrogen *
+      state.NH3
+    );
+  };
+
+  const quantityFeedPerday = () => {
+    return (state.fishMass * state.feedingRatio) / 100;
+  };
+
+  console.log(state);
 
   return (
     <>
@@ -35,7 +48,7 @@ const App = () => {
         <h1 className="title is-2">RAS Design</h1> <hr />
         <div className="columns">
           <div className="column">
-            <label className="label">Fish Mass (kg)</label>
+            <label className="label">Total fish Mass (kg)</label>
             <input
               name="fishMass"
               onChange={(e) => handleChange(e)}
@@ -46,11 +59,11 @@ const App = () => {
           </div>
 
           <div className="column">
-            <label className="label">Proposed daily feed (kg)</label>
+            <label className="label">Protein ratio (%)</label>
             <input
-              name="proposedDailyFeed"
+              name="feedProtein"
               onChange={(e) => handleChange(e)}
-              defaultValue={state.proposedDailyFeed.toString()}
+              defaultValue={state.feedProtein.toString()}
               className="input is-warning"
             />
           </div>
@@ -107,31 +120,14 @@ const App = () => {
             />
           </div>
         </div>
+        <br />
         <div className="columns">
           <div className="column  down">
             <label className="label">Quantity feed per day</label>
             <div className="title is-5">
-              {(state.fishMass * state.feedingRatio) / 100} kg =
-              {((state.fishMass * state.feedingRatio) / 100) * 1000} g
+              {quantityFeedPerday()} kg ={quantityFeedPerday() * 1000} g
             </div>
           </div>
-
-          {/* <div className="column">
-            <label className="label">Nitrogen (g)</label>
-            <div className="title is-5">{state.nitrogen}</div>
-          </div>
-          <div className="column">
-            <label className="label">Waste nitrogen (g)</label>
-            <div className="title is-5">{state.wasteNitrogen}</div>
-          </div>
-          <div className="column">
-            <label className="label">NH3 (g)</label>
-            <div className="title is-5">{state.NH3}</div>
-          </div> */}
-          {/* <div className="column">
-            <label className="label">Ammonia conversion rate/m2/day (g)</label>
-            <div className="title is-5">{state.ammoniaConversationRate}</div>
-          </div> */}
 
           <div className="column down">
             <label className="label">Stocking density (kg/m^2)</label>
@@ -143,19 +139,8 @@ const App = () => {
           <div className="column  down">
             <label className="label">TAN</label>
             <div className="title is-5">
-              {state.feedProtein *
-                ((state.fishMass * state.feedingRatio) / 100000000) *
-                state.nitrogen *
-                state.wasteNitrogen *
-                state.NH3}{' '}
-              kg ={' '}
-              {state.feedProtein *
-                ((state.fishMass * state.feedingRatio) / 100000000) *
-                state.nitrogen *
-                state.wasteNitrogen *
-                state.NH3 *
-                1000}
-              g
+              {tan()}
+              kg ={tan() * 1000}g
             </div>
           </div>
 
@@ -199,19 +184,21 @@ const App = () => {
             </div>
           </div>
 
-          <div className="column down">
+          {/* this one */}
+          <div
+            className="column down"
+            // style={{ backgroundColor: 'red' }}
+          >
             <label className="label">
-              Maximum concentration of totla ammonia (TAN mg/l)
+              Maximum concentration of total ammonia (TAN mg/l)
             </label>
             <div className="title is-5">
-              {((state.feedProtein *
-                ((state.fishMass * state.feedingRatio) / 100000000) *
-                state.nitrogen *
-                state.wasteNitrogen *
-                state.NH3 *
-                1000) /
-                (state.totalWaterVolume * 24000)) *
-                1000}
+              {(
+                (tan() * 1000000) /
+                (state.totalWaterVolume *
+                  1000 *
+                  (24 / state.estimatedFilterExchangeRate))
+              ).toPrecision(5)}
             </div>
           </div>
 
@@ -231,7 +218,7 @@ const App = () => {
           </div>
 
           <div className="column down">
-            <label className="label">Total media / day (m3)</label>
+            <label className="label">Volume of media (m^3)</label>
             <div className="title is-5">
               {(
                 (state.feedProtein *
