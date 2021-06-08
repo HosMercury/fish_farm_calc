@@ -11,8 +11,8 @@ const App = () => {
     nitrogen: 0.16,
     wasteNitrogen: 0.61,
     NH3: 1.2,
-    initialWeight: 1000000,
-    finalWeight: 1500000,
+    initialWeight: 100000,
+    finalWeight: 150000,
     numberOfDays: 14,
     waterTemperature: 25,
     ph: 8,
@@ -25,7 +25,8 @@ const App = () => {
     FCR: null,
     feedEffiency: null,
     toxicAmonia: null,
-    tan: null
+    tan: null,
+    proteinEffiency: null
   });
 
   const handleChange = (e) => {
@@ -43,12 +44,14 @@ const App = () => {
 
   const fcr = () => {
     return (
-      (quantityFeedPerDay() * state.numberOfDays) /
-      (state.finalWeight - state.initialWeight)
-    );
+      ((quantityFeedPerDay() * state.numberOfDays) /
+        (state.finalWeight - state.initialWeight)) *
+      1000
+    ).toPrecision(5);
   };
 
-  console.log(state.tanConcentration);
+  console.log(state);
+
   return (
     <>
       <div className="box has-text-centered">
@@ -78,13 +81,14 @@ const App = () => {
             <input
               name="feedingRatio"
               onChange={(e) => handleChange(e)}
-              defaultValue={state.feedingRatio}
+              defaultValue={state.feedingRatio.toString()}
               className="input is-warning"
             />
             <h6 className="title is-6 ">daily feed</h6>
           </div>
+
           <div className="column">
-            <label className="label">Feed Protein</label>
+            <label className="label">Protein ratio (%)</label>
             <input
               name="feedProtein"
               onChange={(e) => handleChange(e)}
@@ -124,8 +128,8 @@ const App = () => {
               defaultValue={state.numberOfDays.toString()}
             />
             <h6 className="title is-6 ">day</h6>
-          </div>{' '}
-          <div className="column">
+          </div>
+          {/* <div className="column">
             <label className="label">Water temperature</label>
             <input
               name="waterTemperature"
@@ -133,8 +137,8 @@ const App = () => {
               defaultValue={state.waterTemperature.toString()}
               className="input is-warning"
             />
-          </div>
-          <div className="column">
+          </div> */}
+          {/* <div className="column">
             <label className="label">PH</label>
             <input
               name="ph"
@@ -142,9 +146,9 @@ const App = () => {
               defaultValue={state.ph.toString()}
               className="input is-warning"
             />
-          </div>
+          </div> */}
           <div className="column">
-            <label className="label">F</label>
+            <label className="label">F-Table</label>
             <input
               name="f"
               onChange={(e) => handleChange(e)}
@@ -162,9 +166,10 @@ const App = () => {
             />
           </div>
         </div>
+        <br />
         <div className="columns">
           <div className="column down">
-            <label className="label">Proposed stocking density (kg/m^3)</label>
+            <label className="label">Stocking density (kg/m^3)</label>
             <div className="title is-5">
               {state.totalFishMass / state.totalVolumeOfWater}
             </div>
@@ -176,7 +181,7 @@ const App = () => {
             </h6>
           </div>
           <div className="column down">
-            <label className="label">Quantity of protein (kg)</label>
+            <label className="label">Protein intake (kg)</label>
             <div className="title is-5">
               {((state.feedProtein / 100) * quantityFeedPerDay()).toPrecision(
                 5
@@ -224,6 +229,19 @@ const App = () => {
           <div className="column down">
             <label className="label">FCR</label>
             <div className="title is-5">{fcr()}</div>
+          </div>
+
+          <div className="column down">
+            <label className="label">Protein effiency ratio (PER)</label>
+            <div className="title is-5">
+              {(
+                (state.finalWeight - state.initialWeight) /
+                (state.feedProtein *
+                  quantityFeedPerDay() *
+                  state.numberOfDays) /
+                10
+              ).toPrecision(5)}
+            </div>
           </div>
 
           <div className="column down">
